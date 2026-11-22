@@ -120,6 +120,23 @@ DATABASES = {
     }
 }
 
+# Em produção (Render, Neon etc.) o banco vem num endereço só:
+# DATABASE_URL=postgresql://usuario:senha@host/banco?sslmode=require
+if os.getenv('DATABASE_URL'):
+    from urllib.parse import urlparse, parse_qsl, unquote
+
+    _url = urlparse(os.environ['DATABASE_URL'])
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': _url.path.lstrip('/'),
+        'USER': unquote(_url.username or ''),
+        'PASSWORD': unquote(_url.password or ''),
+        'HOST': _url.hostname or '',
+        'PORT': str(_url.port or ''),
+        'OPTIONS': dict(parse_qsl(_url.query)),
+        'CONN_MAX_AGE': 60,
+    }
+
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 

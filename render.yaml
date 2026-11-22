@@ -1,0 +1,28 @@
+# Configuração do Render (https://render.com): site React + API Django
+# num serviço web gratuito, usando o Dockerfile da raiz do projeto.
+services:
+  - type: web
+    name: casa-de-cultura-sao-mateus
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/categorias/
+    autoDeploy: true
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: CSRF_TRUSTED_ORIGINS_EXTRA
+        value: https://casa-de-cultura-sao-mateus.onrender.com
+      # Endereço de conexão do banco no Neon (preenchido no painel do Render)
+      - key: DATABASE_URL
+        sync: false
+      # Conta de administrador criada na primeira inicialização
+      - key: ADMIN_USUARIO
+        value: admin
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_SENHA
+        sync: false
