@@ -1,0 +1,10 @@
+.git
+**/node_modules
+**/venv
+**/.venv
+**/__pycache__
+**/*.sqlite3
+**/.env
+frontend/dist
+backend/staticfiles
+backend/backup_eventos.json

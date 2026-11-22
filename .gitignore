@@ -19,3 +19,5 @@ frontend/dist/
 
 # Configuracoes locais do VS Code
 .vscode/
+
+backend/staticfiles/

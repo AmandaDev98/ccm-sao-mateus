@@ -24,18 +24,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vrve=)y-%&o(&73-=!k!otg=ax#azo*7^s-&ya(4x2+^b6*2$j'
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-vrve=)y-%&o(&73-=!k!otg=ax#azo*7^s-&ya(4x2+^b6*2$j',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.app.github.dev',
     'https://localhost:8000',
-    'http://localhost:8000'
-]
+    'http://localhost:8000',
+] + [o for o in os.getenv('CSRF_TRUSTED_ORIGINS_EXTRA', '').split(',') if o]
+
+# Em produção (Cloud Run), o Google termina o HTTPS antes do Django
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -55,6 +61,7 @@ AUTH_USER_MODEL = 'eventos.Usuario'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -148,6 +155,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Build do React (frontend/dist), copiado para cá pelo Dockerfile de produção.
+# O WhiteNoise serve esses arquivos direto na raiz do site.
+FRONTEND_DIST = BASE_DIR / 'frontend_dist'
+WHITENOISE_ROOT = FRONTEND_DIST if FRONTEND_DIST.exists() else None
+WHITENOISE_INDEX_FILE = True
 
 
 # Email
